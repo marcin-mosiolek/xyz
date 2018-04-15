@@ -29,6 +29,8 @@ class DataLoader(object):
         zipped = list(zip(self.train_x, self.train_y))
         random.shuffle(zipped)
         self.train_x, self.train_y = zip(*zipped)
+        self.train_x = np.array(self.train_x)
+        self.train_y = np.array(self.train_y)
 
     def __iter__(self):
         return self.next()
