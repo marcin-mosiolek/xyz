@@ -62,7 +62,7 @@ def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
     return np.mean(losses)
 
 
-def main(num_epochs = 100, batch_size = 128, learning_rate = 1e-3):
+def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3):
     # load data
     data = DataLoader("../autencoder/convex_hulls.npy", batch_size=batch_size)
 
@@ -73,11 +73,11 @@ def main(num_epochs = 100, batch_size = 128, learning_rate = 1e-3):
 
     # train the stuff
     for epoch in range(num_epochs):
-        train_loss = train_step(model, criterion, optimizer, data.train_x, data.train_y)
-        valid_loss = validate(model, criterion, data.valid_x, data.valid_y)
+        print("======== Epoch [{}/{} ========".format(epoch + 1, num_epochs))
+        valid_loss = validate(model, criterion, data.valid_x, data.valid_y, batch_size)
+        train_loss = train_step(model, criterion, optimizer, data.train_x, data.train_y, batch_size)
 
-        print('> Epoch [{}/{}], train loss:{:.4f}, valid loss:{:.4f}'
-              .format(epoch + 1, num_epochs, train_loss, valid_loss))
+        print('Train loss: {:.4f}\nValid loss:{:.4f}'.format(train_loss, valid_loss))
 
     torch.save(model.state_dict(), './conv_autoencoder.pth')
 
