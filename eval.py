@@ -45,7 +45,7 @@ def main(batch_size = 64):
     for x, y in zip(data.valid_x, data.valid_y):
         progress.next()
         start_time = time.time()
-        predicted_y = model(x)
+        predicted_y = model(make_gpu(x))
         predicted_y = make_numpy(predicted_y)
         predicted_y = predicted_y.reshape(300, 400)
         predicted_grid = ndimage.label(predicted_y, structure=np.ones((3, 3)))
