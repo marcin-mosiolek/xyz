@@ -11,7 +11,7 @@ from progress.bar import Bar
 
 def validate(model, criterion, valid_x, valid_y, batch_size=128):
     losses = []
-    data_len = len(valid_x)
+    data_len = int(len(valid_x) / batch_size)
 
     progress = Bar("Validation", max=data_len)
 
@@ -35,7 +35,7 @@ def validate(model, criterion, valid_x, valid_y, batch_size=128):
 
 def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
     losses = []
-    data_len = len(train_x)
+    data_len = int(len(train_x) / batch_size)
 
     progress = Bar("Training", max=data_len)
 
@@ -75,7 +75,7 @@ def main(num_epochs = 100, batch_size = 128, learning_rate = 1e-3):
         train_loss = train_step(model, criterion, optimizer, data.train_x, data.train_y)
         valid_loss = validate(model, criterion, data.valid_x, data.valid_y)
 
-        print('epoch [{}/{}], train loss:{:.4f}, valid loss:{:.4f}'
+        print('> Epoch [{}/{}], train loss:{:.4f}, valid loss:{:.4f}'
               .format(epoch + 1, num_epochs, train_loss, valid_loss))
 
     torch.save(model.state_dict(), './conv_autoencoder.pth')
