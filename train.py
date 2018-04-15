@@ -4,6 +4,7 @@ from torch import nn
 
 from tools import DataLoader
 from model import AutoEncoder
+from tools import make_var
 
 from progress.bar import Bar
 
@@ -24,8 +25,8 @@ def main(num_epochs = 100, batch_size = 128, learning_rate = 1e-3):
         for x, y in data:
             progress.next()
             #print(x.shape)
-            x = Variable(torch.from_numpy(x)).float().cuda()
-            y = Variable(torch.from_numpy(y)).float().cuda()
+            x = make_var(x)
+            y = make_var(y)
             # ===================forward=====================
             predicted_y = model(x)
             loss = criterion(predicted_y, y)
@@ -34,13 +35,15 @@ def main(num_epochs = 100, batch_size = 128, learning_rate = 1e-3):
             loss.backward()
             optimizer.step()
         # ===================log========================
-        print('epoch [{}/{}], loss:{:.4f}'
-              .format(epoch + 1, num_epochs, loss.data[0]))
-        if epoch % 5 == 0:
-            valid_x, valid_y = data.valid_data()
-            predicted_y = model(valid_x)
-            loss = criterion(predicted_y, valid_y)
-            print("Validation loss: {}".format(loss))
+        valid_x, valid_y = data.valid_data()
+        valid_x = make_var(valid_x)
+        valid_y = make_var(valid_y)
+        predicted_y = model(valid_x)
+        valid_loss = criterion(predicted_y, valid_y)
+
+        print('epoch [{}/{}], train loss:{:.4f}, valid loss:{:.4f}'
+              .format(epoch + 1, num_epochs, loss.data[0], valid_loss.data[0]))
+
         progress.finish()
     torch.save(model.state_dict(), './conv_autoencoder.pth')
 

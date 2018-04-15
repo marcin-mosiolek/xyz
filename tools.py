@@ -1,5 +1,7 @@
 import numpy as np
 import random
+import torch
+from torch.autograd import Variable
 
 
 class DataLoader(object):
@@ -43,5 +45,9 @@ class DataLoader(object):
 
     def valid_data(self):
         return self.valid_x, self.valid_y
+
+
+def make_var(var):
+    return Variable(torch.from_numpy(var)).float().cuda()
 
 
