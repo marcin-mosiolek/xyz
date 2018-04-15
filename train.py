@@ -12,9 +12,9 @@ from progress.bar import Bar
 
 def validate(model, criterion, valid_x, valid_y, batch_size=128):
     losses = []
-    data_len = int(len(valid_x) / batch_size)
+    data_len = len(valid_x)
 
-    progress = Bar("Validation", max=data_len)
+    progress = Bar("Validation", max=int(data_len / batch_size))
 
     for i in range(0, data_len, batch_size):
         # process batches
@@ -36,9 +36,9 @@ def validate(model, criterion, valid_x, valid_y, batch_size=128):
 
 def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
     losses = []
-    data_len = int(len(train_x) / batch_size)
+    data_len = len(train_x)
 
-    progress = Bar("Training", max=data_len)
+    progress = Bar("Training", max=int(data_len / batch_size))
 
     for i in range(0, data_len, batch_size):
         # process batches
