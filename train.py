@@ -88,7 +88,7 @@ def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping
         train_loss = train_step(model, criterion, optimizer, data.train_x, data.train_y, batch_size)
         valid_loss, exe_time = validate(model, criterion, data.valid_x, data.valid_y, batch_size)
         print('Train loss: {:.4f}\nValid loss:{:.4f}'.format(train_loss, valid_loss))
-        print('Average execution time {:5.f}'.format(exe_time / batch_size))
+        print('Average execution time {:.5f}'.format(exe_time / batch_size))
 
         # Early stopping
         if last_valid_loss <= valid_loss:
