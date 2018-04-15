@@ -1,16 +1,58 @@
-from torch.utils.data import DataLoader
-from torchvision import transforms
-from torchvision.utils import save_image
-from torchvision.datasets import MNIST
 
-img_transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-])
+import torch
+import numpy as np
+from torch.autograd import Variable
+from torch import nn
 
-dataset = MNIST('./data', transform=img_transform, download=True)
-dataloader = DataLoader(dataset, batch_size=128, shuffle=True)
+from tools import DataLoader
+from model import AutoEncoder
+from tools import make_gpu, make_numpy
+from scipy import ndimage
 
-for d in dataloader:
-    img, _ = d
-    print(img.shape)
+from progress.bar import Bar
+
+import time
+
+
+def stats(name, data):
+    print("\n============ {} \n============ {} ".format(name))
+    print("Mean: {}".format(np.mean(data)))
+    print("Std: {}".format(np.mean(data)))
+    q = [x for x in range(0, 100, 21)]
+    percentiles = np.percentile(data, q=q)
+    print("Percentiles:")
+    for i, p in zip(q, percentiles):
+        print("{}%:{:.3f}".format(i, p))
+
+
+def main(batch_size = 64):
+    # load data
+    data = DataLoader("../autencoder/convex_hulls.npy")
+
+    # load the model and parameters
+    model = AutoEncoder().cuda()
+
+    # load the weights from file
+    weights = torch.load("./conv_autoencoder.pth")
+    autencoder.load_state_dict(weights)
+
+    # store stats
+    exec_times = []
+    no_true_clusters = []
+    no_predicted_clusters = []
+
+    for x, y in zip(data.valid_x, data.valid_y):
+        start_time = time.time()
+        predicted_y = model(x)
+        predicted_y = make_numpy(predicted_y)
+        predicted_y = predicted_y.reshape(300, 400)
+        predicted_grid = ndimage.label(predicted_y, structure=np.ones((3, 3)))
+        end_time = time.time()
+
+        exec_times.append(end_time - start_time)
+
+    stats("Execution time", exect_times)
+
+
+if __name__ == "__main__":
+    main()
