@@ -22,6 +22,7 @@ def main(num_epochs = 100, batch_size = 128, learning_rate = 1e-3):
     for epoch in range(num_epochs):
         progress = Bar("Training", max=data.len())
         for x, y in data:
+            progress.next()
             #print(x.shape)
             x = Variable(torch.from_numpy(x)).float().cuda()
             y = Variable(torch.from_numpy(y)).float().cuda()
@@ -38,7 +39,7 @@ def main(num_epochs = 100, batch_size = 128, learning_rate = 1e-3):
         if epoch % 10 == 0:
             pic = to_img(output.cpu().data)
             save_image(pic, './dc_img/image_{}.png'.format(epoch))
-
+        progress.finish()
     torch.save(model.state_dict(), './conv_autoencoder.pth')
 
 if __name__ == "__main__":
