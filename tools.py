@@ -8,7 +8,7 @@ class DataLoader(object):
     def __init__(self, path):
         self.x, y = np.load(path, mmap_mode='r+')
 
-        x = x.reshape(-1, 1, 300, 400)
+        x = self.x.reshape(-1, 1, 300, 400)
         y = y.reshape(-1, 1, 300, 400)
 
         x = self.normalize(x)
