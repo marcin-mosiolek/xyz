@@ -24,8 +24,8 @@ def validate(model, criterion, valid_x, valid_y, batch_size=128):
         x = valid_x[i: i + batch_size]
         y = valid_y[i: i + batch_size]
         # make cuda variables
-        x = make_var(x)
-        y = make_var(y)
+        x = make_gpu(x)
+        y = make_gpu(y)
         # make predictions
         start_time = time.time()
         predicted_y = model(x)
@@ -51,8 +51,8 @@ def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
         x = train_x[i: i + batch_size]
         y = train_y[i: i + batch_size]
         # make cuda variables
-        x = make_var(x)
-        y = make_var(y)
+        x = make_gpu(x)
+        y = make_gpu(y)
         # make predictions
         predicted_y = model(x)
         loss = criterion(predicted_y, y)

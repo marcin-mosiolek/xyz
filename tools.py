@@ -18,7 +18,7 @@ class DataLoader(object):
         self.train_x = x[:self.pivot]
         self.train_y = y[:self.pivot]
         self.valid_x = x[self.pivot:]
-        self.valid_y = x[self.pivot:]
+        self.valid_y = y[self.pivot:]
         self.batch_size = batch_size
 
     def normalize(self, data):
@@ -49,7 +49,9 @@ class DataLoader(object):
         return self.valid_x, self.valid_y
 
 
-def make_var(var):
+def make_gpu(var):
     return Variable(torch.from_numpy(var)).float().cuda()
 
+def make_cpu(var):
+    return Variable(torch.from_numpy(var)).float().cuda()
 
