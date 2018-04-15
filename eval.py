@@ -63,7 +63,7 @@ def main():
         end_time = time.time()
 
         # measure the clustering quality
-        valid_inds = np.where((x > 0) & (predicted_grid > 0))
+        valid_inds = np.where((x > 0) & (predicted_grid > 0))[0]
         true_labels = x[valid_inds]
         predicted_labels = predicted_grid[valid_inds]
         metrics.append(metrics.adjusted_rand_score(true_labels, predicted_labels))
