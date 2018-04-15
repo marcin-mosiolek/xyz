@@ -45,6 +45,7 @@ def main(batch_size = 64):
     for x, y in zip(data.valid_x, data.valid_y):
         progress.next()
         start_time = time.time()
+        x = x.reshape(-1, 1, 300, 400)
         predicted_y = model(make_gpu(x))
         predicted_y = make_numpy(predicted_y)
         predicted_y = predicted_y.reshape(300, 400)
