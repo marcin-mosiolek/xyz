@@ -36,9 +36,11 @@ def main(num_epochs = 100, batch_size = 128, learning_rate = 1e-3):
         # ===================log========================
         print('epoch [{}/{}], loss:{:.4f}'
               .format(epoch + 1, num_epochs, loss.data[0]))
-        if epoch % 10 == 0:
-            pic = to_img(output.cpu().data)
-            save_image(pic, './dc_img/image_{}.png'.format(epoch))
+        if epoch % 5 == 0:
+            valid_x, valid_y = data.valid_data()
+            predicted_y = model(valid_x)
+            loss = criterion(predicted_y, valid_y)
+            print("Validation loss: {}".format(loss))
         progress.finish()
     torch.save(model.state_dict(), './conv_autoencoder.pth')
 

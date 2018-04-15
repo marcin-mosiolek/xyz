@@ -41,4 +41,7 @@ class DataLoader(object):
     def len(self):
         return int(len(self.train_x)/self.batch_size)
 
+    def valid_data(self):
+        return self.valid_x, self.valid_y
+
 
