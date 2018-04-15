@@ -77,6 +77,7 @@ def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping
 
     for epoch in range(num_epochs):
         print("\n======== Epoch [{}/{}] ========".format(epoch + 1, num_epochs))
+        data.shuffle()
         train_loss = train_step(model, criterion, optimizer, data.train_x, data.train_y, batch_size)
         valid_loss = validate(model, criterion, data.valid_x, data.valid_y, batch_size)
         print('Train loss: {:.4f}\nValid loss:{:.4f}'.format(train_loss, valid_loss))
