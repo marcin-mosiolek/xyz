@@ -55,7 +55,7 @@ def main(batch_size = 64):
         exec_times.append(end_time - start_time)
     progress.finish()
 
-    stats("Execution time", exect_times)
+    stats("Execution time", exec_times)
 
 
 if __name__ == "__main__":
