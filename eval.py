@@ -1,6 +1,8 @@
 
 import torch
 import numpy as np
+from sklearn import metrics
+
 from torch.autograd import Variable
 from torch import nn
 
@@ -30,7 +32,7 @@ def extract_no_clusters(grid):
     return len(np.unique(grid) - 1)
 
 
-def main(batch_size = 64):
+def main():
     # load data
     data = DataLoader("../autencoder/convex_hulls.npy")
 
@@ -45,10 +47,13 @@ def main(batch_size = 64):
     exec_times = []
     no_true_clusters = []
     no_predicted_clusters = []
+    metrics = []
 
     progress = Bar("Eval", max=len(data.valid_x))
     for grid, x, y in zip(data.x, data.valid_x, data.valid_y):
         progress.next()
+
+        # measure execution time of clustering
         start_time = time.time()
         x = x.reshape(-1, 1, 300, 400)
         predicted_y = model(make_gpu(x))
@@ -57,6 +62,13 @@ def main(batch_size = 64):
         predicted_grid, pred_no_clusters = ndimage.label(predicted_y, structure=np.ones((3, 3)))
         end_time = time.time()
 
+        # measure the clustering quality
+        valid_inds = np.where((x > 0) & (predicted_grid > 0))
+        true_labels = x[valid_inds]
+        predicted_labels = predicted_grid[valid_inds]
+        metrics.append(metrics.adjusted_rand_score(true_labels, predicted_labels))
+
+        # log the stuff
         no_true_clusters.append(extract_no_clusters(grid))
         no_predicted_clusters.append(pred_no_clusters)
         exec_times.append(end_time - start_time)
@@ -64,6 +76,7 @@ def main(batch_size = 64):
 
     stats("Execution time", exec_times)
     stats("Clusters no", np.array(no_true_clusters) - np.array(no_predicted_clusters))
+    stats("Adjusted radn score", metrics)
 
 
 if __name__ == "__main__":
