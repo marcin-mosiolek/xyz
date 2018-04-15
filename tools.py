@@ -31,4 +31,7 @@ class DataLoader(object):
         for i in range(0, self.pivot, self.batch_size):
             yield self.train_x[i: i + self.batch_size], self.train_y[i : i + self.batch_size]
 
+    def len(self):
+        return len(self.train_x)
+
 

@@ -5,23 +5,26 @@ from torch import nn
 from tools import DataLoader
 from model import AutoEncoder
 
+from progress.bar import Bar
+
 
 def main(num_epochs = 100, batch_size = 128, learning_rate = 1e-3):
     # load data
-    data = DataLoader("../tooploox/outputs/convex_hulls.npy", batch_size=batch_size)
+    data = DataLoader("../autencoder/convex_hulls.npy", batch_size=batch_size)
 
     # load the model and parameters
-    model = AutoEncoder()#.cuda()
+    model = AutoEncoder().cuda()
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate,
                                  weight_decay=1e-5)
 
     # train the stuff
     for epoch in range(num_epochs):
+        progress = Bar("Training", max=data.len())
         for x, y in data:
-            print(x.shape)
-            x = Variable(torch.from_numpy(x)).float()#.cuda()
-            y = Variable(torch.from_numpy(y)).float()
+            #print(x.shape)
+            x = Variable(torch.from_numpy(x)).float().cuda()
+            y = Variable(torch.from_numpy(y)).float().cuda()
             # ===================forward=====================
             predicted_y = model(x)
             loss = criterion(predicted_y, y)
