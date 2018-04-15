@@ -47,7 +47,7 @@ def main():
     exec_times = []
     no_true_clusters = []
     no_predicted_clusters = []
-    metrics = []
+    score = []
 
     progress = Bar("Eval", max=len(data.valid_x))
     for grid, x, y in zip(data.x, data.valid_x, data.valid_y):
@@ -66,7 +66,7 @@ def main():
         valid_inds = np.where((x > 0) & (predicted_grid > 0))[0]
         true_labels = x[valid_inds]
         predicted_labels = predicted_grid[valid_inds]
-        metrics.append(metrics.adjusted_rand_score(true_labels, predicted_labels))
+        score.append(metrics.adjusted_rand_score(true_labels, predicted_labels))
 
         # log the stuff
         no_true_clusters.append(extract_no_clusters(grid))
@@ -76,7 +76,7 @@ def main():
 
     stats("Execution time", exec_times)
     stats("Clusters no", np.array(no_true_clusters) - np.array(no_predicted_clusters))
-    stats("Adjusted radn score", metrics)
+    stats("Adjusted rand score", score)
 
 
 if __name__ == "__main__":
