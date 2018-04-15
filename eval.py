@@ -65,6 +65,7 @@ def main():
         # measure the clustering quality
         valid_inds = np.where((x > 0) & (predicted_grid > 0))[0]
         true_labels = x[valid_inds]
+        print(true_labels.shape)
         predicted_labels = predicted_grid[valid_inds]
         score.append(metrics.adjusted_rand_score(true_labels, predicted_labels))
 
