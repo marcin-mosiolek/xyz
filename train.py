@@ -70,7 +70,7 @@ def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
 
 def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping=5, shuffle=True):
     # load data
-    data = DataLoader("../autencoder/convex_hulls.npy", batch_size=batch_size)
+    data = DataLoader("../autencoder/convex_hulls.npy")
 
     # load the model and parameters
     model = AutoEncoder().cuda()
