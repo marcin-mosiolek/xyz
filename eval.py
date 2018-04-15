@@ -47,7 +47,7 @@ def main(batch_size = 64):
         start_time = time.time()
         x = x.reshape(-1, 1, 300, 400)
         predicted_y = model(make_gpu(x))
-        predicted_y = make_numpy(predicted_y)
+        predicted_y = make_numpy(predicted_y.cpu())
         predicted_y = predicted_y.reshape(300, 400)
         predicted_grid = ndimage.label(predicted_y, structure=np.ones((3, 3)))
         end_time = time.time()
