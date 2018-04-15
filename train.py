@@ -25,7 +25,7 @@ def validate(model, criterion, valid_x, valid_y, batch_size=128):
         # make predictions
         predicted_y = model(x)
         loss = criterion(predicted_y, y)
-        losses.append(loss)
+        losses.append(loss.data[0])
         # monitor progress
         progress.next()
     progress.finish()
@@ -37,7 +37,7 @@ def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
     losses = []
     data_len = len(train_x)
 
-    progress = Bar("Training", max_data_len)
+    progress = Bar("Training", max=data_len)
 
     for i in range(0, data_len, batch_size):
         # process batches
@@ -53,7 +53,7 @@ def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        losses.append(loss)
+        losses.append(loss.data[0])
         # monitor progress
         progress.next()
     progress.finish()
@@ -68,8 +68,7 @@ def main(num_epochs = 100, batch_size = 128, learning_rate = 1e-3):
     # load the model and parameters
     model = AutoEncoder().cuda()
     criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate,
-                                 weight_decay=1e-5)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 
     # train the stuff
     for epoch in range(num_epochs):
