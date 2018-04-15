@@ -32,6 +32,6 @@ class DataLoader(object):
             yield self.train_x[i: i + self.batch_size], self.train_y[i : i + self.batch_size]
 
     def len(self):
-        return len(self.train_x)
+        return int(len(self.train_x)/self.batch_size)
 
 
