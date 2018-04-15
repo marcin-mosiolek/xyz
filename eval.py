@@ -41,7 +41,7 @@ def main(batch_size = 64):
     no_true_clusters = []
     no_predicted_clusters = []
 
-    progress = Bar("Eval", max=int(data.valid_x))
+    progress = Bar("Eval", max=len(data.valid_x))
     for x, y in zip(data.valid_x, data.valid_y):
         progress.next()
         start_time = time.time()
