@@ -62,7 +62,7 @@ def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
     return np.mean(losses)
 
 
-def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3):
+def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping=5):
     # load data
     data = DataLoader("../autencoder/convex_hulls.npy", batch_size=batch_size)
 
@@ -72,12 +72,25 @@ def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3):
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 
     # train the stuff
+    last_valid_loss = 1000
+    stop_iter = early_stopping
+
     for epoch in range(num_epochs):
-        print("\n======== Epoch [{}/{} ========".format(epoch + 1, num_epochs))
+        print("\n======== Epoch [{}/{}] ========".format(epoch + 1, num_epochs))
         train_loss = train_step(model, criterion, optimizer, data.train_x, data.train_y, batch_size)
         valid_loss = validate(model, criterion, data.valid_x, data.valid_y, batch_size)
-
         print('Train loss: {:.4f}\nValid loss:{:.4f}'.format(train_loss, valid_loss))
+
+        # Early stopping
+        if last_valid_loss <= valid_loss:
+            stop_iter -= 1
+        else:
+            stop_iter = early_stopping
+            last_valid_loss = valid_loss
+
+        if not stop_iter:
+            print("> Early stopping")
+            break
 
     torch.save(model.state_dict(), './conv_autoencoder.pth')
 
