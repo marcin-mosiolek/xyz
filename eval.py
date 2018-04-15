@@ -63,6 +63,7 @@ def main():
         end_time = time.time()
 
         # measure the clustering quality
+        print(grid.shape)
         valid_inds = np.where((x > 0) & (predicted_grid > 0))[0]
         true_labels = x[valid_inds]
         print(true_labels.shape)
