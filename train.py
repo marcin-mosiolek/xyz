@@ -5,7 +5,7 @@ from torch import nn
 
 from tools import DataLoader
 from model import AutoEncoder
-from tools import make_var
+from tools import make_gpu
 
 from progress.bar import Bar
 
