@@ -18,7 +18,7 @@ def stats(name, data):
     print("\n============ {} \n============".format(name))
     print("Mean: {}".format(np.mean(data)))
     print("Std: {}".format(np.mean(data)))
-    q = [x for x in range(0, 100, 21)]
+    q = [x for x in np.linspace(0, 100, 21)]
     percentiles = np.percentile(data, q=q)
     print("Percentiles:")
     for i, p in zip(q, percentiles):
