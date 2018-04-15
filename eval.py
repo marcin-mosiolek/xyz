@@ -34,14 +34,16 @@ def main(batch_size = 64):
 
     # load the weights from file
     weights = torch.load("./conv_autoencoder.pth")
-    autencoder.load_state_dict(weights)
+    model.load_state_dict(weights)
 
     # store stats
     exec_times = []
     no_true_clusters = []
     no_predicted_clusters = []
 
+    progress = Bar("Eval", max=int(data.valid_x))
     for x, y in zip(data.valid_x, data.valid_y):
+        progress.next()
         start_time = time.time()
         predicted_y = model(x)
         predicted_y = make_numpy(predicted_y)
@@ -50,6 +52,7 @@ def main(batch_size = 64):
         end_time = time.time()
 
         exec_times.append(end_time - start_time)
+    progress.finish()
 
     stats("Execution time", exect_times)
 
