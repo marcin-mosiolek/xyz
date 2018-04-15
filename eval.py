@@ -26,7 +26,8 @@ def stats(name, data):
 
 
 def extract_no_clusters(grid):
-    return len(np.unique(grid))
+    # -1 because it returns 0 as well
+    return len(np.unique(grid) - 1)
 
 
 def main(batch_size = 64):
