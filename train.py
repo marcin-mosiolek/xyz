@@ -9,9 +9,12 @@ from tools import make_var
 
 from progress.bar import Bar
 
+import time
+
 
 def validate(model, criterion, valid_x, valid_y, batch_size=128):
     losses = []
+    times = []
     data_len = len(valid_x)
 
     progress = Bar("Validation", max=int(data_len / batch_size))
@@ -24,14 +27,17 @@ def validate(model, criterion, valid_x, valid_y, batch_size=128):
         x = make_var(x)
         y = make_var(y)
         # make predictions
+        start_time = time.time()
         predicted_y = model(x)
+        end_time = time.time()
         loss = criterion(predicted_y, y)
         losses.append(loss.data[0])
+        times.append(end_time - start_time)
         # monitor progress
         progress.next()
     progress.finish()
 
-    return np.mean(losses)
+    return np.mean(losses), np.mean(times)
 
 
 def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
@@ -62,7 +68,7 @@ def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
     return np.mean(losses)
 
 
-def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping=5):
+def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping=5, shuffle=True):
     # load data
     data = DataLoader("../autencoder/convex_hulls.npy", batch_size=batch_size)
 
@@ -77,10 +83,12 @@ def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping
 
     for epoch in range(num_epochs):
         print("\n======== Epoch [{}/{}] ========".format(epoch + 1, num_epochs))
-        data.shuffle()
+        if shuffle:
+            data.shuffle()
         train_loss = train_step(model, criterion, optimizer, data.train_x, data.train_y, batch_size)
-        valid_loss = validate(model, criterion, data.valid_x, data.valid_y, batch_size)
+        valid_loss, exe_time = validate(model, criterion, data.valid_x, data.valid_y, batch_size)
         print('Train loss: {:.4f}\nValid loss:{:.4f}'.format(train_loss, valid_loss))
+        print('Average execution time {:5.f}'.format(exe_time / batch_size))
 
         # Early stopping
         if last_valid_loss <= valid_loss:
