@@ -5,7 +5,7 @@ from torch.autograd import Variable
 
 
 class DataLoader(object):
-    def __init__(self, path, batch_size=128):
+    def __init__(self, path):
         x, y = np.load(path, mmap_mode='r+')
 
         x = x.reshape(-1, 1, 300, 400)
@@ -19,7 +19,6 @@ class DataLoader(object):
         self.train_y = y[:self.pivot]
         self.valid_x = x[self.pivot:]
         self.valid_y = y[self.pivot:]
-        self.batch_size = batch_size
 
     def normalize(self, data):
         data[data > 0] = 1.0
@@ -32,26 +31,15 @@ class DataLoader(object):
         self.train_x = np.array(self.train_x)
         self.train_y = np.array(self.train_y)
 
-    def __iter__(self):
-        return self.next()
-
-    def __next__(self):
-        return self.next()
-
-    def next(self):
-        for i in range(0, self.pivot, self.batch_size):
-            yield self.train_x[i: i + self.batch_size], self.train_y[i : i + self.batch_size]
-
-    def len(self):
-        return int(len(self.train_x)/self.batch_size)
-
-    def valid_data(self):
-        return self.valid_x, self.valid_y
-
 
 def make_gpu(var):
     return Variable(torch.from_numpy(var)).float().cuda()
 
+
 def make_cpu(var):
-    return Variable(torch.from_numpy(var)).float().cuda()
+    return Variable(torch.from_numpy(var)).float().cpu()
+
+
+def make_numpy(var):
+    return var.data.numpy()
 
