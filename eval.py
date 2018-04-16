@@ -9,7 +9,7 @@ from sklearn import metrics
 from progress.bar import Bar
 import sys
 import matplotlib.pyplot as plt
-
+import math
 
 def cluster(grid):
     grid = grid.reshape(300, 400)
@@ -90,11 +90,11 @@ def get_score_for_frame(autoencoder, data, frame_no, threshold=0.9, visualize=Fa
         show_all(x, y, py, labelled)
 
     true_labels, predicted_labels = extract_labels(x, labelled)
-    no_true_labels = len(np.unique(true_labels))
-    no_pred_labels = len(np.unique(predicted_labels))
-    score = metrics.adjusted_rand_score(true_labels, predicted_labels)
+    no_true_convex_hulls = len(np.unique(x)) - 1
+    no_pred_convex_hulls = len(np.unique(labelled)) - 1
+    score = metrics.adjusted_mutual_info_score(true_labels, predicted_labels)
 
-    return score, no_true_labels, no_pred_labels, end_time - start_time
+    return score, no_true_convex_hulls, no_pred_convex_hulls, end_time - start_time
 
 
 def main():
@@ -110,10 +110,12 @@ def main():
     pcs = []
     ets = []
 
-    progress = Bar("Evaluation", max=len(data.valid_x))
+    progress = Bar("Evaluation: ", max=len(data.valid_x))
     for frame_no in range(0, len(data.valid_x)):
         progress.next()
         score, tc, pc, et = get_score_for_frame(autoencoder, data, frame_no, threshold=0.9)
+        if math.isnan(score):
+            continue
         scores.append(score)
         tcs.append(tc)
         pcs.append(pc)
@@ -122,7 +124,7 @@ def main():
     progress.finish()
 
     stats("Score", scores)
-    stats("TC - PC", np.array(tcs) - np.array(pcs))
+    stats("Convex hulls", np.abs(np.array(tcs) - np.array(pcs)))
     print("\nMean execution time: {:.4f}".format(np.mean(et)))
 
 if __name__ == "__main__":
