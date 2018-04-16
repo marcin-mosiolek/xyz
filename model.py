@@ -34,18 +34,27 @@ class VAE(nn.Module):
     def __init__(self):
         super(VAE, self).__init__()
 
-        self.fc1 = nn.Linear(300 * 400, 400)
+        self.enc1 = nn.Linear(300 * 400, 1200)
+        self.enc2 = nn.Linear(1200, 600)
+        self.enc3 = nn.Linear(600, 400)
+
         self.fc21 = nn.Linear(400, 20)
         self.fc22 = nn.Linear(400, 20)
-        self.fc3 = nn.Linear(20, 400)
-        self.fc4 = nn.Linear(400, 300 * 400)
+
+        self.dec3 = nn.Linear(30, 400)
+        self.dec2 = nn.Linear(400, 600)
+        self.dec1 = nn.linear(600, 1200)
+        self.dec0 = nn.Linear(1200, 300 * 400)
 
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def encode(self, x):
-        h1 = self.relu(self.fc1(x))
-        return self.fc21(h1), self.fc22(h1)
+        x = self.relu(self.enc1(x))
+        x = self.relu(self.enc2(x))
+        x = self.relu(self.enc3(x))
+
+        return self.fc21(x), self.fc22(x)
 
     def reparameterize(self, mu, logvar):
         if self.training:
@@ -56,8 +65,11 @@ class VAE(nn.Module):
             return mu
 
     def decode(self, z):
-        h3 = self.relu(self.fc3(z))
-        return self.sigmoid(self.fc4(h3))
+        z = self.relu(self.dec3(z))
+        z = self.relu(self.dec2(z))
+        z = self.relu(self.dec1(z))
+        z = self.relu(self.dec0(z))
+        return self.sigmoid(z)
 
     def forward(self, x):
         mu, logvar = self.encode(x.view(-1, 300 * 400))
