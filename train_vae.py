@@ -83,6 +83,12 @@ def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping
     data = DataLoader("../autencoder/convex_hulls.npy")
     print("...completed")
 
+    # normalize data
+    data.train_x = data.normalize(data.train_x)
+    data.train_y = data.normalize(data.train_y)
+    data.valid_x = data.normalize(data.valid_x)
+    data.valid_y = data.normalize(data.valid_y)
+
     # load the  and parameters
     model = VAE().cuda()
     optimizer = torch.optim.Adam(model.parameters())
