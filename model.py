@@ -62,7 +62,7 @@ class VAE(nn.Module):
         )
 
         self.relu = nn.ReLU()
-        self.sigmoid = nn.Sigmoid()
+        #self.sigmoid = nn.Sigmoid()
 
     def encode(self, x):
         x = self.encoder(x)
@@ -81,8 +81,7 @@ class VAE(nn.Module):
     def decode(self, z):
         #print(z.size())
         z = self.relu(self.pre_decoder(z)).view(-1, 16, 71, 96)
-        z = self.decoder(z)
-        return self.sigmoid(z)
+        return self.decoder(z)
 
     def forward(self, x):
         mu, logvar = self.encode(x)
