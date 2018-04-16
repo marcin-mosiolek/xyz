@@ -4,7 +4,7 @@ from torch.autograd import Variable
 from torch import nn
 
 from tools import DataLoader
-from model import VarAutoEncoder
+from model import VAE
 from tools import make_gpu
 
 from progress.bar import Bar
@@ -82,8 +82,8 @@ def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping
     data = DataLoader("../autencoder/convex_hulls.npy")
     print("...completed")
 
-    # load the model and parameters
-    model = VarAutoEncoder().cuda()
+    # load the  and parameters
+    model = VAE().cuda()
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters())
 
