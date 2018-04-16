@@ -55,7 +55,7 @@ class VAE(nn.Module):
             nn.ReLU(True),
             nn.ConvTranspose2d(8, 8, 8, stride=2, padding=0),
             nn.ReLU(True),
-            nn.ConvTranspose2d(8, 1, 3, stride=2, padding=0),
+            nn.ConvTranspose2d(8, 1, 3, stride=1, padding=0),
             nn.Tanh()
         )
 
