@@ -7,7 +7,7 @@ import time
 import eval
 from sklearn import metrics
 from progress.bar import Bar
-
+import sys
 import matplotlib.pyplot as plt
 
 
@@ -17,7 +17,7 @@ def cluster(grid):
     return ndimage.label(grid, structure=np.ones((3, 3)))
 
 
-def get_frame(data, frame_no, pivot):
+def get_frame(data, frame_no):
     return data.valid_x[frame_no], data.valid_y[frame_no]
 
 
@@ -28,7 +28,7 @@ def show(frame):
 
 def predict(model, x):
     x = x.reshape(-1, 1, 300, 400)
-    x = tools.make_cpu(x)
+    x = tools.make_gpu(x)
     return model(x)
 
 
@@ -54,11 +54,6 @@ def show_all(x, y, pred_y, labelled):
     plt.savefig("example_1.png")
 
 
-def extract_no_clusters(grid):
-    # -1 because it returns 0 as well
-    return len(np.unique(grid) - 1)
-
-
 def extract_labels(true_grid, predicted_grid):
     valid_inds = np.where((true_grid > 0) & (predicted_grid > 0))
     true_labels = true_grid[valid_inds]
@@ -77,16 +72,19 @@ def stats(name, data):
         print("{}%:{:.3f}".format(i, p))
 
 
-def get_score_for_frame(data, frame_no, threshold=0.9, visualize=False):
+def get_score_for_frame(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     # visualize results
-    x, y = get_frame(data, frame_no, 0)
+    x, y = get_frame(data, frame_no)
     x = x.reshape(300, 400)
-    py = predict(autencoder, data.normalize(x.copy()))
 
-    py = tools.make_numpy(py)
+    start_time = time.time()
+    py = predict(autoencoder, data.normalize(x.copy()))
+
+    py = tools.make_numpy(py.cpu())
     py[py >= threshold] = 255
     py[py < threshold] = 0
     labelled, _ = cluster(py)
+    end_time = time.time()
 
     if visualize:
         show_all(x, y, py, labelled)
@@ -96,31 +94,36 @@ def get_score_for_frame(data, frame_no, threshold=0.9, visualize=False):
     no_pred_labels = len(np.unique(predicted_labels))
     score = metrics.adjusted_rand_score(true_labels, predicted_labels)
 
-    return score, no_true_labels, no_pred_labels
+    return score, no_true_labels, no_pred_labels, end_time - start_time
 
 
 def main():
     # create model
-    autencoder_weights = torch.load("conv_autoencoder.pth", map_location=lambda storage, loc: storage)
-    autencoder = model.AutoEncoder()
-    autencoder.load_state_dict(autencoder_weights)
+    autoencoder_weights = torch.load("conv_autoencoder.pth", map_location=lambda storage, loc: storage)
+    autoencoder = model.AutoEncoder().cuda()
+    autoencoder.load_state_dict(autoencoder_weights)
 
+    # load data
+    data = tools.DataLoader("/mnt/moria/voyage_clustering/convex_hulls2.npy")
     scores = []
     tcs = []
     pcs = []
+    ets = []
 
     progress = Bar("Evaluation", max=len(data.valid_x))
     for frame_no in range(0, len(data.valid_x)):
         progress.next()
-        score, tc, pc = get_score_for_frame(data, frame_no, threshold=0.9)
+        score, tc, pc, et = get_score_for_frame(autoencoder, data, frame_no, threshold=0.9)
         scores.append(score)
         tcs.append(tc)
         pcs.append(pc)
+        ets.append(et)
 
     progress.finish()
 
     stats("Score", scores)
-    stats("TC - PC", np,array(tcs) - np.array(pcs))
+    stats("TC - PC", np.array(tcs) - np.array(pcs))
+    print("\nMean execution time: {:.4f}".format(np.mean(et)))
 
 if __name__ == "__main__":
     main()

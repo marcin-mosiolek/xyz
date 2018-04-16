@@ -6,13 +6,12 @@ from torch.autograd import Variable
 
 class DataLoader(object):
     def __init__(self, path):
-        self.x, y = np.load(path, mmap_mode='r+')
-
+        self.x, self.y = np.load(path)
         x = self.x.reshape(-1, 1, 300, 400)
-        y = y.reshape(-1, 1, 300, 400)
+        y = self.y.reshape(-1, 1, 300, 400)
 
-        x = self.normalize(x)
-        y = self.normalize(y)
+        #x = self.normalize(x)
+        #y = self.normalize(y)
 
         self.pivot = int(len(x) * 0.75)
         self.train_x = x[:self.pivot]
