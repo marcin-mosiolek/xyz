@@ -1,5 +1,5 @@
 import torch
-from torch import nn
+from torch.autograd import Variable
 
 class AutoEncoder(nn.Module):
     def __init__(self):
