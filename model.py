@@ -41,7 +41,7 @@ class VAE(nn.Module):
         self.fc21 = nn.Linear(400, 20)
         self.fc22 = nn.Linear(400, 20)
 
-        self.dec3 = nn.Linear(30, 400)
+        self.dec3 = nn.Linear(20, 400)
         self.dec2 = nn.Linear(400, 600)
         self.dec1 = nn.Linear(600, 1200)
         self.dec0 = nn.Linear(1200, 300 * 400)
