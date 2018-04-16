@@ -43,7 +43,7 @@ class VAE(nn.Module):
 
         self.dec3 = nn.Linear(30, 400)
         self.dec2 = nn.Linear(400, 600)
-        self.dec1 = nn.linear(600, 1200)
+        self.dec1 = nn.Linear(600, 1200)
         self.dec0 = nn.Linear(1200, 300 * 400)
 
         self.relu = nn.ReLU()
