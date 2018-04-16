@@ -28,10 +28,10 @@ def validate(model, valid_x, valid_y, batch_size=128):
         y = make_gpu(y)
         # make predictions
         start_time = time.time()
-        predicted_y, mu, logvar = model(data)
+        predicted_y, mu, logvar = model(x)
         end_time = time.time()
 
-        loss = loss_function(predicted_y, x, mu, logvar)
+        loss = loss_function(predicted_y, y, mu, logvar)
 
         losses.append(loss.data[0])
         times.append(end_time - start_time)
@@ -63,7 +63,7 @@ def train_step(model, optimizer, train_x, train_y, batch_size=128):
         y = make_gpu(y)
         # make predictions
         predicted_y, mu, logvar = model(x)
-        loss = loss_function(predicted_y, x, mu, logvar)
+        loss = loss_function(predicted_y, y, mu, logvar)
         # backprop
         optimizer.zero_grad()
         loss.backward()
@@ -94,8 +94,8 @@ def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping
         print("\n======== Epoch [{}/{}] ========".format(epoch + 1, num_epochs))
         if shuffle:
             data.shuffle()
-        train_loss = train_step(model, criterion, optimizer, data.train_x, data.train_y, batch_size)
-        valid_loss, exe_time = validate(model, criterion, data.valid_x, data.valid_y, batch_size)
+        train_loss = train_step(model, optimizer, data.train_x, data.train_y, batch_size)
+        valid_loss, exe_time = validate(model, data.valid_x, data.valid_y, batch_size)
         print('Train loss: {:.6f}\nValid loss: {:.6f}'.format(train_loss, valid_loss))
         print('Average execution time {:.6f}'.format(exe_time / batch_size))
 
