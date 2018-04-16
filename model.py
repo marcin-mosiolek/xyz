@@ -65,8 +65,8 @@ class VAE(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def encode(self, x):
-        print(x.size())
         x = self.encoder(x)
+        print(x.size())
         x = self.relu(self.post_encoder(x.view(-1, 8, 16, 6)))
         return self.fc1(x), self.fc2(x)
 
