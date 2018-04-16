@@ -52,13 +52,14 @@ class VAE(nn.Module):
             nn.Tanh()
         )
 
-        self.fc1 = nn.Linear(16 * 286 * 386, 20)
-        self.fc2 = nn.Linear(16 * 286 * 386, 20)
+        self.fc1 = nn.Linear(16 * 286 * 386, 16 * 286 * 386)
+        self.fc2 = nn.Linear(16 * 286 * 386, 16 * 286 * 386)
 
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def encode(self, x):
+        print(x.size())
         x = self.encoder(x)
         x = x.view(-1, 16 * 286 * 386)
         return self.fc1(x), self.fc2(x)
