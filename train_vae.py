@@ -76,7 +76,7 @@ def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
     return np.mean(losses)
 
 
-def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping=5, shuffle=True):
+def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping=5, shuffle=False):
     # load data
     print("Loading data...")
     data = DataLoader("../autencoder/convex_hulls.npy")
@@ -84,7 +84,6 @@ def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping
 
     # load the  and parameters
     model = VAE().cuda()
-    criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters())
 
     # train the stuff

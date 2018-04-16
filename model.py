@@ -59,6 +59,6 @@ class VAE(nn.Module):
         return self.sigmoid(self.fc4(h3))
 
     def forward(self, x):
-        mu, logvar = self.encode(x.view(-1, 784))
+        mu, logvar = self.encode(x.view(-1, 300 * 400))
         z = self.reparameterize(mu, logvar)
         return self.decode(z), mu, logvar
