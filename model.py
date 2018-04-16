@@ -35,12 +35,12 @@ class VAE(nn.Module):
         super(VAE, self).__init__()
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(1, 8, 8, stride=1, padding=0),
+            nn.Conv2d(1, 8, 8, stride=2, padding=0),
             nn.ReLU(True),
-            nn.MaxPool2d(2, stride=1),
-            nn.Conv2d(8, 16, 6, stride=1, padding=0),
+            nn.MaxPool2d(2, stride=2),
+            nn.Conv2d(8, 16, 6, stride=2, padding=0),
             nn.ReLU(True),
-            nn.MaxPool2d(2, stride=1)
+            nn.MaxPool2d(2, stride=2)
         )
 
         self.post_encoder = nn.Linear(16 * 286 * 386, 512)
@@ -51,11 +51,11 @@ class VAE(nn.Module):
         self.pre_decoder = nn.Linear(512, 16 * 286 * 386)
 
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(16, 8, 6, stride=1),
+            nn.ConvTranspose2d(16, 8, 6, stride=2),
             nn.ReLU(True),
-            nn.ConvTranspose2d(8, 8, 8, stride=1, padding=0),
+            nn.ConvTranspose2d(8, 8, 8, stride=2, padding=0),
             nn.ReLU(True),
-            nn.ConvTranspose2d(8, 1, 3, stride=1, padding=0),
+            nn.ConvTranspose2d(8, 1, 3, stride=2, padding=0),
             nn.Tanh()
         )
 
