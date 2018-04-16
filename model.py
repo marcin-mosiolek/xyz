@@ -48,7 +48,7 @@ class VAE(nn.Module):
         self.fc1 = nn.Linear(512, 512)
         self.fc2 = nn.Linear(512, 512)
 
-
+        self.pre_decoder = nn.Linear(512, 16 * 286 * 386)
 
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(16, 8, 6, stride=1),
@@ -58,8 +58,6 @@ class VAE(nn.Module):
             nn.ConvTranspose2d(8, 1, 3, stride=1, padding=0),
             nn.Tanh()
         )
-
-
 
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
@@ -80,6 +78,7 @@ class VAE(nn.Module):
 
     def decode(self, z):
         print(z.size())
+        z = self.relu(self.pre_decoder(z)).view(-1, 16, 286, 386)
         z = self.decoder(z)
         return self.sigmoid(z)
 
