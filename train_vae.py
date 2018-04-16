@@ -8,6 +8,7 @@ from model import VAE
 from tools import make_gpu
 
 from progress.bar import Bar
+from torch.nn import functional as F
 
 import time
 
