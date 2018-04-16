@@ -40,7 +40,9 @@ class VAE(nn.Module):
             nn.MaxPool2d(2, stride=1),
             nn.Conv2d(8, 16, 6, stride=1, padding=0),
             nn.ReLU(True),
-            nn.MaxPool2d(2, stride=1)
+            nn.MaxPool2d(2, stride=1).view(-1, 16 * 286 * 386),
+            nn.Linear(16 * 286 * 386, 512),
+            nn.ReLU(True)
         )
 
         self.decoder = nn.Sequential(
@@ -52,8 +54,8 @@ class VAE(nn.Module):
             nn.Tanh()
         )
 
-        self.fc1 = nn.Linear(16 * 286 * 386, 16 * 286 * 386)
-        self.fc2 = nn.Linear(16 * 286 * 386, 16 * 286 * 386)
+        self.fc1 = nn.Linear(512, 512)
+        self.fc2 = nn.Linear(512, 512)
 
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
@@ -61,7 +63,6 @@ class VAE(nn.Module):
     def encode(self, x):
         print(x.size())
         x = self.encoder(x)
-        x = x.view(-1, 16 * 286 * 386)
         return self.fc1(x), self.fc2(x)
 
     def reparameterize(self, mu, logvar):
@@ -74,7 +75,6 @@ class VAE(nn.Module):
 
     def decode(self, z):
         print(z.size())
-        z = z.view(-1, 16, 286, 386)
         z = self.decoder(z)
         return self.sigmoid(z)
 
