@@ -4,7 +4,7 @@ from torch.autograd import Variable
 from torch import nn
 
 from tools import DataLoader
-from model import AutoEncoder
+from model import VarAutoEncoder
 from tools import make_gpu
 
 from progress.bar import Bar
@@ -12,7 +12,7 @@ from progress.bar import Bar
 import time
 
 
-def validate(model, criterion, valid_x, valid_y, batch_size=128):
+def validate(model, valid_x, valid_y, batch_size=128):
     losses = []
     times = []
     data_len = len(valid_x)
@@ -28,9 +28,11 @@ def validate(model, criterion, valid_x, valid_y, batch_size=128):
         y = make_gpu(y)
         # make predictions
         start_time = time.time()
-        predicted_y = model(x)
+        predicted_y, mu, logvar = model(data)
         end_time = time.time()
-        loss = criterion(predicted_y, y)
+
+        loss = loss_function(predicted_y, x, mu, logvar)
+
         losses.append(loss.data[0])
         times.append(end_time - start_time)
         # monitor progress
@@ -38,6 +40,12 @@ def validate(model, criterion, valid_x, valid_y, batch_size=128):
     progress.finish()
 
     return np.mean(losses), np.mean(times)
+
+
+def loss_function(recon_x, x, mu, logvar):
+    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), size_average=False)
+    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    return BCE + KLD
 
 
 def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
@@ -54,8 +62,8 @@ def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
         x = make_gpu(x)
         y = make_gpu(y)
         # make predictions
-        predicted_y = model(x)
-        loss = criterion(predicted_y, y)
+        predicted_y, mu, logvar = model(x)
+        loss = loss_function(predicted_y, x, mu, logvar)
         # backprop
         optimizer.zero_grad()
         loss.backward()
@@ -70,10 +78,12 @@ def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
 
 def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping=5, shuffle=True):
     # load data
+    print("Loading data...")
     data = DataLoader("../autencoder/convex_hulls.npy")
+    print("...completed")
 
     # load the model and parameters
-    model = AutoEncoder().cuda()
+    model = VarAutoEncoder().cuda()
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters())
 
