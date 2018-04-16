@@ -78,6 +78,10 @@ def train_step(model, optimizer, train_x, train_y, batch_size=128):
 
 
 def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping=5, shuffle=False):
+    # load parameters
+    model = VAE().cuda()
+    optimizer = torch.optim.Adam(model.parameters())
+
     # load data
     print("Loading data...")
     data = DataLoader("../autencoder/convex_hulls.npy")
@@ -89,9 +93,7 @@ def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping
     data.valid_x = data.normalize(data.valid_x)
     data.valid_y = data.normalize(data.valid_y)
 
-    # load the  and parameters
-    model = VAE().cuda()
-    optimizer = torch.optim.Adam(model.parameters())
+
 
     # train the stuff
     best_valid_loss = 1000
