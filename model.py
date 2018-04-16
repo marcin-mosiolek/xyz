@@ -43,7 +43,7 @@ class VAE(nn.Module):
             nn.MaxPool2d(2, stride=1)
         )
 
-        self.post_encoder = nn.Linear(8 * 16 * 6, 512)
+        self.post_encoder = nn.Linear(16 * 286 * 386, 512)
 
         self.fc1 = nn.Linear(512, 512)
         self.fc2 = nn.Linear(512, 512)
@@ -67,7 +67,7 @@ class VAE(nn.Module):
     def encode(self, x):
         x = self.encoder(x)
         print(x.size())
-        x = self.relu(self.post_encoder(x.view(-1, 8 * 16 * 6)))
+        x = self.relu(self.post_encoder(x.view(-1, 16 * 286 * 386)))
         return self.fc1(x), self.fc2(x)
 
     def reparameterize(self, mu, logvar):
