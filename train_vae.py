@@ -48,7 +48,7 @@ def loss_function(recon_x, x, mu, logvar):
     return BCE + KLD
 
 
-def train_step(model, criterion, optimizer, train_x, train_y, batch_size=128):
+def train_step(model, optimizer, train_x, train_y, batch_size=128):
     losses = []
     data_len = len(train_x)
 
