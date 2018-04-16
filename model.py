@@ -34,27 +34,33 @@ class VAE(nn.Module):
     def __init__(self):
         super(VAE, self).__init__()
 
-        self.enc1 = nn.Linear(300 * 400, 1200)
-        self.enc2 = nn.Linear(1200, 600)
-        self.enc3 = nn.Linear(600, 400)
+        self.encoder = nn.Sequential(
+            nn.Conv2d(1, 8, 8, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.MaxPool2d(2, stride=1),
+            nn.Conv2d(8, 16, 6, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.MaxPool2d(2, stride=1)
+        )
 
-        self.fc21 = nn.Linear(400, 20)
-        self.fc22 = nn.Linear(400, 20)
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(16, 8, 6, stride=1),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(8, 8, 8, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(8, 1, 3, stride=1, padding=0),
+            nn.Tanh()
+        )
 
-        self.dec3 = nn.Linear(20, 400)
-        self.dec2 = nn.Linear(400, 600)
-        self.dec1 = nn.Linear(600, 1200)
-        self.dec0 = nn.Linear(1200, 300 * 400)
+        self.fc1 = nn.Linear(400, 20)
+        self.fc2 = nn.Linear(400, 20)
 
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def encode(self, x):
-        x = self.relu(self.enc1(x))
-        x = self.relu(self.enc2(x))
-        x = self.relu(self.enc3(x))
-
-        return self.fc21(x), self.fc22(x)
+        x = self.encoder(x)
+        return self.fc1(x), self.fc2(x)
 
     def reparameterize(self, mu, logvar):
         if self.training:
@@ -65,13 +71,10 @@ class VAE(nn.Module):
             return mu
 
     def decode(self, z):
-        z = self.relu(self.dec3(z))
-        z = self.relu(self.dec2(z))
-        z = self.relu(self.dec1(z))
-        z = self.relu(self.dec0(z))
+        z = self.decoder(z)
         return self.sigmoid(z)
 
     def forward(self, x):
-        mu, logvar = self.encode(x.view(-1, 300 * 400))
+        mu, logvar = self.encode(x)
         z = self.reparameterize(mu, logvar)
         return self.decode(z), mu, logvar
