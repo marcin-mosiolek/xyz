@@ -37,18 +37,20 @@ class VAE(nn.Module):
         self.encoder = nn.Sequential(
             nn.Conv2d(1, 8, 8, stride=2, padding=0),
             nn.ReLU(True),
-            nn.MaxPool2d(2, stride=2),
+            #nn.MaxPool2d(2, stride=1),
             nn.Conv2d(8, 16, 6, stride=2, padding=0),
             nn.ReLU(True),
-            nn.MaxPool2d(2, stride=2)
+            #nn.MaxPool2d(2, stride=1)
         )
 
-        self.post_encoder = nn.Linear(16 * 17 * 23, 512)
+        self.size = 16 * 71 * 96
+
+        self.post_encoder = nn.Linear(self.size, 512)
 
         self.fc1 = nn.Linear(512, 512)
         self.fc2 = nn.Linear(512, 512)
 
-        self.pre_decoder = nn.Linear(512, 16 * 17 * 23)
+        self.pre_decoder = nn.Linear(512, self.size)
 
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(16, 8, 6, stride=2),
@@ -64,8 +66,8 @@ class VAE(nn.Module):
 
     def encode(self, x):
         x = self.encoder(x)
-        print(x.size())
-        x = self.relu(self.post_encoder(x.view(-1, 16 * 17 * 23)))
+        #print(x.size())
+        x = self.relu(self.post_encoder(x.view(-1, self.size)))
         return self.fc1(x), self.fc2(x)
 
     def reparameterize(self, mu, logvar):
@@ -77,8 +79,8 @@ class VAE(nn.Module):
             return mu
 
     def decode(self, z):
-        print(z.size())
-        z = self.relu(self.pre_decoder(z)).view(-1, 16, 17, 23)
+        #print(z.size())
+        z = self.relu(self.pre_decoder(z)).view(-1, 16, 71, 96)
         z = self.decoder(z)
         return self.sigmoid(z)
 
