@@ -72,6 +72,7 @@ class VAE(nn.Module):
             return mu
 
     def decode(self, z):
+        print(z.size())
         z = z.view(-1, 16, 286, 386)
         z = self.decoder(z)
         return self.sigmoid(z)
