@@ -12,6 +12,7 @@ from torch.nn import functional as F
 
 import time
 
+criterion = nn.MSELoss()
 
 def validate(model, valid_x, valid_y, batch_size=128):
     losses = []
@@ -44,7 +45,7 @@ def validate(model, valid_x, valid_y, batch_size=128):
 
 
 def loss_function(recon_x, x, mu, logvar):
-    BCE = F.binary_cross_entropy(recon_x.view(-1, 1, 300, 400), x.view(-1, 1, 300, 400), size_average=False)
+    BCE = criterion(recon_x.view(-1, 1, 300, 400), x.view(-1, 1, 300, 400))
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
     return BCE + KLD
 
