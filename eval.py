@@ -113,13 +113,13 @@ def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     true_labels = x[valid_inds]
     common_grid = np.zeros_like(x)
     common_grid[valid_inds] = 1
-    print("\n", true_labels)
+    #print("\n", true_labels)
 
     # now run the baseline algorithm
     closed_grid = ndimage.binary_closing(common_grid, structure=np.ones((4, 4)))
     predicted_labels, _ = cluster(closed_grid)
     predicted_labels = predicted_labels[valid_inds]
-    print("\nn", predicted_labels)
+    #print("\nn", predicted_labels)
 
     return metrics.adjusted_mutual_info_score(true_labels, predicted_labels)
 
@@ -139,7 +139,7 @@ def main():
     pcs = []
     ets = []
 
-    print(np.unique(data.x))
+    #print(np.unique(data.x))
 
     progress = Bar("Evaluation: ", max=len(data.valid_x))
     for frame_no in range(0, len(data.valid_x)):
