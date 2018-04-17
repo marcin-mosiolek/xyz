@@ -33,7 +33,7 @@ def main():
 
         # now we can run two clusterings, one based on the baseline algorithms, the other on the convex hulls
         # 1) baseline algorithm
-        closed_grid = ndimage.gray_closing(common, structure=np.ones((4, 4)))
+        closed_grid = ndimage.binary_closing(common, structure=np.ones((4, 4)))
         baseline_labels = ndimage.label(closed_grid, structure=np.ones((3, 3)))
 
         # 2) convex hulls algorithm
