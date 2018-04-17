@@ -110,9 +110,9 @@ def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     py[py < threshold] = 0
     # 2) Extract points from the original grid which belongs to predicted convex hulls
     valid_inds = (x > 0) & (py > 0)
+    true_labels = x[valid_inds]
     common_grid = np.zeros_like(x)
     common_grid[valid_inds] = 1
-    true_labels = x[valid_inds]
     print("\n", true_labels)
 
     # now run the baseline algorithm
