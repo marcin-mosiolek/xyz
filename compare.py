@@ -2,6 +2,7 @@ import tools
 from progress.bar import Bar
 from scipy import ndimage
 from sklearn import metrics
+import math
 import numpy as np
 import pandas as pd
 pd.set_option("precision", 3)
@@ -37,13 +38,15 @@ def main():
         baseline_labels = baseline_labels[(x > 0) & (y > 0)]
         convex_labels = convex_labels[(x > 0) & (y > 0)]
 
-        baseline_scores.append(
-            metrics.adjusted_mutual_info_score(true_labels, baseline_labels)
-        )
+        baseline_score = metrics.adjusted_mutual_info_score(true_labels, baseline_labels)
+        convex_score = metrics.adjusted_mutual_info_score(true_labels, convex_labels)
 
-        convex_scores.append(
-            metrics.adjusted_mutual_info_score(true_labels, convex_labels)
-        )
+        if math.isnan(baseline_score) or math.isnan(convex_score):
+            continue
+
+
+        baseline_scores.append(baseline_score)
+        convex_scores.append(convex_score)
 
         progress.next()
     progress.finish()
