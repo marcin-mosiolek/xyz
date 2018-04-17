@@ -11,6 +11,8 @@ import sys
 import matplotlib.pyplot as plt
 import math
 
+import pandas as pd
+
 def cluster(grid):
     grid = grid.reshape(300, 400)
     grid = grid.astype(np.int32)
@@ -132,7 +134,7 @@ def main():
     autoencoder.load_state_dict(autoencoder_weights)
 
     # load data
-    data = tools.DataLoader("/mnt/moria/voyage_clustering/convex_hulls2.npy", keep_original=True)
+    data = tools.DataLoader("/mnt/moria/voyage_clustering/convex_hulls.npy", keep_original=True)
     scores = []
     baseline_scores = []
     tcs = []
@@ -156,6 +158,13 @@ def main():
         baseline_scores.append(baseline_score)
 
     progress.finish()
+
+    df = pd.DataFrame(data={
+        "Baseline" : baseline_scores,
+        "Convex" : scores
+    })
+
+    df.describe(percentiles=np.linspace(0, 1, 21)).to_csv("eval.csv")
 
     stats("Autoencoder score", scores)
     stats("Baseline score", baseline_scores)
