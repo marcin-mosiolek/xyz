@@ -5,13 +5,14 @@ from torch.autograd import Variable
 
 
 class DataLoader(object):
-    def __init__(self, path):
+    def __init__(self, path, keep_original=False):
         x, y = np.load(path)
         x = x.reshape(-1, 1, 300, 400)
         y = y.reshape(-1, 1, 300, 400)
 
-        self.x = x
-        self.y = y
+        if keep_original:
+            self.x = x.copy()
+            self.y = y.copy()
 
         self.pivot = int(len(x) * 0.75)
         self.train_x = x[:self.pivot]
