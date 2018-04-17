@@ -113,6 +113,7 @@ def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     common_grid = np.zeros_like(x)
     common_grid[valid_inds] = 1
     true_labels = x[valid_inds]
+    print("\n", true_labels)
 
     # now run the baseline algorithm
     closed_grid = ndimage.binary_closing(common_grid, structure=np.ones((4, 4)))
