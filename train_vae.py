@@ -15,6 +15,8 @@ import time
 criterion = nn.MSELoss()
 
 def validate(model, valid_x, valid_y, batch_size=128):
+    model.training = False
+    
     losses = []
     times = []
     data_len = len(valid_x)
@@ -44,13 +46,14 @@ def validate(model, valid_x, valid_y, batch_size=128):
     return np.mean(losses), np.mean(times)
 
 
-def loss_function(recon_x, x, mu, logvar):
-    BCE = criterion(recon_x.view(-1, 1, 300, 400), x.view(-1, 1, 300, 400))
+def loss_function(recon_x, y, mu, logvar):
+    BCE = criterion(recon_x, y)
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
     return BCE + KLD
 
 
 def train_step(model, optimizer, train_x, train_y, batch_size=128):
+    model.training = True
     losses = []
     data_len = len(train_x)
 
@@ -65,6 +68,7 @@ def train_step(model, optimizer, train_x, train_y, batch_size=128):
         y = make_gpu(y)
         # make predictions
         predicted_y, mu, logvar = model(x)
+        print("Result: {}".format(predicted_y))
         loss = loss_function(predicted_y, y, mu, logvar)
         # backprop
         optimizer.zero_grad()
@@ -78,28 +82,28 @@ def train_step(model, optimizer, train_x, train_y, batch_size=128):
     return np.mean(losses)
 
 
-def main(num_epochs = 100, batch_size = 64, learning_rate = 1e-3, early_stopping=5, shuffle=False):
+def main(num_epochs = 1000, batch_size = 64, learning_rate = 1e-3, early_stopping=5, shuffle=False):
     # load parameters
+    print("Loading model...")
     model = VAE().cuda()
     optimizer = torch.optim.Adam(model.parameters())
+    for name, param in model.named_parameters():
+        if param.requires_grad:
+            print(name, param.size())
 
+    print("...completed")
     # load data
     print("Loading data...")
-    data = DataLoader("../autencoder/convex_hulls.npy")
+    data = DataLoader("/mnt/moria/voyage_clustering/convex_hulls2.npy")
+    data.shuffle()
     print("...completed")
-
-    # normalize data
-    data.train_x = data.normalize(data.train_x)
-    data.train_y = data.normalize(data.train_y)
-    data.valid_x = data.normalize(data.valid_x)
-    data.valid_y = data.normalize(data.valid_y)
-
-
+    print("Training set size: {}".format(data.train_x.shape))
+    print("Validation set size: {}".format(data.valid_x.shape))
 
     # train the stuff
     best_valid_loss = 1000
     stop_iter = early_stopping
-
+    
     for epoch in range(num_epochs):
         print("\n======== Epoch [{}/{}] ========".format(epoch + 1, num_epochs))
         if shuffle:

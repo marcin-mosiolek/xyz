@@ -6,18 +6,18 @@ from torch.autograd import Variable
 
 class DataLoader(object):
     def __init__(self, path):
-        self.x, self.y = np.load(path)
-        x = self.x.reshape(-1, 1, 300, 400)
-        y = self.y.reshape(-1, 1, 300, 400)
+        x, y = np.load(path)
+        x = x.reshape(-1, 1, 300, 400)
+        y = y.reshape(-1, 1, 300, 400)
 
-        #x = self.normalize(x)
-        #y = self.normalize(y)
+        self.x = self.normalize(x)
+        self.y = self.normalize(y)
 
         self.pivot = int(len(x) * 0.75)
-        self.train_x = x[:self.pivot]
-        self.train_y = y[:self.pivot]
-        self.valid_x = x[self.pivot:]
-        self.valid_y = y[self.pivot:]
+        self.train_x = self.x[:self.pivot]
+        self.train_y = self.y[:self.pivot]
+        self.valid_x = self.x[self.pivot:]
+        self.valid_y = self.y[self.pivot:]
 
     def normalize(self, data):
         data[data > 0] = 1.0
@@ -26,9 +26,9 @@ class DataLoader(object):
     def shuffle(self):
         zipped = list(zip(self.train_x, self.train_y))
         random.shuffle(zipped)
-        self.train_x, self.train_y = zip(*zipped)
-        self.train_x = np.array(self.train_x)
-        self.train_y = np.array(self.train_y)
+        x, y = zip(*zipped)
+        self.train_x = np.array(x)
+        self.train_y = np.array(y)
 
 
 def make_gpu(var):
