@@ -118,6 +118,8 @@ def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     # now run the baseline algorithm
     closed_grid = ndimage.binary_closing(common_grid, structure=np.ones((4, 4)))
     predicted_labels, _ = cluster(closed_grid)
+    predicted_labels = predicted_labels[valid_inds]
+    print("\nn", predicted_labels)
 
     return metrics.adjusted_mutual_info_score(true_labels, predicted_labels)
 
