@@ -105,6 +105,7 @@ def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     # 1) Extract predicted convex hulls
     py = predict(autoencoder, data.normalize(x.copy()))
     py = tools.make_numpy(py.cpu())
+    py = py.reshape(300, 400)
     py[py >= threshold] = 1
     py[py < threshold] = 0
     # 2) Extract points from the original grid which belongs to predicted convex hulls
