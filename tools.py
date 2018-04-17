@@ -10,8 +10,8 @@ class DataLoader(object):
         x = x.reshape(-1, 1, 300, 400)
         y = y.reshape(-1, 1, 300, 400)
 
-        self.x = self.normalize(x)
-        self.y = self.normalize(y)
+        self.x = x
+        self.y = y
 
         self.pivot = int(len(x) * 0.75)
         self.train_x = self.x[:self.pivot]
@@ -19,6 +19,11 @@ class DataLoader(object):
         self.valid_x = self.x[self.pivot:]
         self.valid_y = self.y[self.pivot:]
 
+        self.train_x = self.normalize(self.train_x)
+        self.train_y = self.normalize(self.train_y)
+        self.valid_x = self.normalize(self.valid_x)
+        self.valid_y = self.normalize(self.valid_y)
+        
     def normalize(self, data):
         data[data > 0] = 1.0
         return data
