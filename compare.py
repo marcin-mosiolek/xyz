@@ -15,7 +15,7 @@ def stats(name, data):
         print("{}%:{:.3f}".format(i, p))
 
 def main():
-    data = tools.DataLoader("/mnt/moria/voyage_clustering/convex_hulls2.npy", keep_original=True)
+    data = tools.DataLoader("./mnt/moria/voyage_clustering/convex_hulls2.npy", keep_original=True)
 
     baseline_scores = []
     convex_scores = []
@@ -24,8 +24,8 @@ def main():
     # for each frame
     for x, y in zip(data.x, data.y):
         # convert to nice size
-        x = x.reshape(300, 400)
-        y = y.reshape(300, 400)
+        x = x.reshape(300, 400).astype(np.int32)
+        y = y.reshape(300, 400).astype(np.int32)
 
         # extract pixels which are present only on the both images
         common = np.zeros_like(x)
@@ -34,23 +34,23 @@ def main():
         # now we can run two clusterings, one based on the baseline algorithms, the other on the convex hulls
         # 1) baseline algorithm
         closed_grid = ndimage.binary_closing(common, structure=np.ones((4, 4)))
-        baseline_labels = ndimage.label(closed_grid, structure=np.ones((3, 3)))
+        baseline_labels, _ = ndimage.label(closed_grid, structure=np.ones((3, 3)))
 
         # 2) convex hulls algorithm
         norm_y = data.normalize(y.copy())
-        convex_labels = ndimage.label(norm_y, structure=np.ones((3, 3)))
+        convex_labels, _ = ndimage.label(norm_y, structure=np.ones((3, 3)))
 
-        # extract orignal pixel values
+        # extract original pixel values
         true_labels = x[(x > 0) & (y > 0)]
         baseline_labels = baseline_labels[(x > 0) & (y > 0)]
         convex_labels = convex_labels[(x > 0) & (y > 0)]
 
         baseline_scores.append(
-            metric.adjusted_mutual_info_score(true_labels, baseline_labels)
+            metrics.adjusted_mutual_info_score(true_labels, baseline_labels)
         )
 
         convex_scores.append(
-            metric.adjusted_mutual_info_score(true_labels, convex_labels)
+            metrics.adjusted_mutual_info_score(true_labels, convex_labels)
         )
 
         progress.next()
