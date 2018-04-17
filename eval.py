@@ -17,8 +17,8 @@ def cluster(grid):
     return ndimage.label(grid, structure=np.ones((3, 3)))
 
 
-def get_frame(data, frame_no):
-    return data.valid_x[frame_no], data.valid_y[frame_no]
+def get_frame(data, frame_no, pivot):
+    return data.x[pivot + frame_no], data.y[pivot + frame_no]
 
 
 def show(frame):
@@ -98,7 +98,7 @@ def eval_autoencdoer(autoencoder, data, frame_no, threshold=0.9, visualize=False
 
 
 def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False)
-    x, y = get_frame(data, frame_no)
+    x, y = get_frame(data, frame_no, data.pivot)
     x = x.reshape(300, 400)
 
     # convert frame to the same representation as for the autoencoder algorithm to make fair comparison
