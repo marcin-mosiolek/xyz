@@ -74,7 +74,7 @@ def stats(name, data):
 
 def eval_autoencdoer(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     # visualize results
-    x, y = get_frame(data, frame_no)
+    x, y = get_frame(data, frame_no, data.pivot)
     x = x.reshape(300, 400)
 
     start_time = time.time()
