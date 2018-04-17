@@ -102,11 +102,10 @@ def eval_autoencdoer(autoencoder, data, frame_no, threshold=0.9, visualize=False
 def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     x, y = get_frame(data, frame_no, data.pivot)
     x = x.reshape(300, 400)
-    
+
     # run baseline algorithm on the raw input
     closed_grid = ndimage.gray_closing(x, structure=np.ones((4, 4)))
     predicted_labels, _ = cluster(closed_grid)
-    baseline_pred = predicted_labels[valid_inds]
 
     # run convex hulls algorithm
     convex_hulls = predict(autoencoder, data.normalize(x.copy()))
@@ -120,7 +119,7 @@ def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False):
 
     # extract labels
     true_labels = x[valid_inds]
-    baseline_labels = baseline_pred[valid_inds]
+    baseline_labels = predicted_labels[valid_inds]
 
     return metrics.adjusted_mutual_info_score(true_labels, baseline_labels)
 
