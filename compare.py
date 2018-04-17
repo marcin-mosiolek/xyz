@@ -3,19 +3,11 @@ from progress.bar import Bar
 from scipy import ndimage
 from sklearn import metrics
 import numpy as np
-
-def stats(name, data):
-    print("\n============ {} ============".format(name))
-    print("Mean: {}".format(np.mean(data)))
-    print("Std: {}".format(np.mean(data)))
-    q = [x for x in np.linspace(0, 100, 21)]
-    percentiles = np.percentile(data, q=q)
-    print("Percentiles:")
-    for i, p in zip(q, percentiles):
-        print("{}%:{:.3f}".format(i, p))
+import pandas as pd
+pd.set_option("precision", 3)
 
 def main():
-    data = tools.DataLoader("./mnt/moria/voyage_clustering/convex_hulls2.npy", keep_original=True)
+    data = tools.DataLoader("../autencoder/small.npy", keep_original=True)
 
     baseline_scores = []
     convex_scores = []
@@ -56,8 +48,14 @@ def main():
         progress.next()
     progress.finish()
 
-    stats("Convex", convex_scores)
-    stats("Baseline", baseline_scores)
+    df = pd.DataFrame({
+        "Baseline" : baseline_scores,
+        "Convex" : convex_scores
+    })
+
+
+    df.describe(percentiles=np.linspace(0, 1, 21)).to_csv("comparison.csv")
+
 
 
 
