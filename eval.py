@@ -102,28 +102,27 @@ def eval_autoencdoer(autoencoder, data, frame_no, threshold=0.9, visualize=False
 def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     x, y = get_frame(data, frame_no, data.pivot)
     x = x.reshape(300, 400)
-
-    # convert frame to the same representation as for the autoencoder algorithm to make fair comparison
-    # 1) Extract predicted convex hulls
-    py = predict(autoencoder, data.normalize(x.copy()))
-    py = tools.make_numpy(py.cpu())
-    py = py.reshape(300, 400)
-    py[py >= threshold] = 1
-    py[py < threshold] = 0
-    # 2) Extract points from the original grid which belongs to predicted convex hulls
-    valid_inds = (x > 0) & (py > 0)
-    true_labels = x[valid_inds]
-    common_grid = np.zeros_like(x)
-    common_grid[valid_inds] = 1
-    #print("\n", true_labels)
-
-    # now run the baseline algorithm
-    closed_grid = ndimage.binary_closing(common_grid, structure=np.ones((4, 4)))
+    
+    # run baseline algorithm on the raw input
+    closed_grid = ndimage.gray_closing(x, structure=np.ones((4, 4)))
     predicted_labels, _ = cluster(closed_grid)
-    predicted_labels = predicted_labels[valid_inds]
-    #print("\nn", predicted_labels)
+    baseline_pred = predicted_labels[valid_inds]
 
-    return metrics.adjusted_mutual_info_score(true_labels, predicted_labels)
+    # run convex hulls algorithm
+    convex_hulls = predict(autoencoder, data.normalize(x.copy()))
+
+    # compare only the points which are present in both labellings
+    convex_hulls = tools.make_numpy(convex_hulls.cpu())
+    convex_hulls = convex_hulls.reshape(300, 400)
+    convex_hulls[convex_hulls >= threshold] = 1
+    convex_hulls[convex_hulls < threshold] = 0
+    valid_inds = (x > 0) & (convex_hulls > 0)
+
+    # extract labels
+    true_labels = x[valid_inds]
+    baseline_labels = baseline_pred[valid_inds]
+
+    return metrics.adjusted_mutual_info_score(true_labels, baseline_labels)
 
 
 
