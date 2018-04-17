@@ -72,7 +72,7 @@ def stats(name, data):
         print("{}%:{:.3f}".format(i, p))
 
 
-def get_score_for_frame(autoencoder, data, frame_no, threshold=0.9, visualize=False):
+def eval_autoencdoer(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     # visualize results
     x, y = get_frame(data, frame_no)
     x = x.reshape(300, 400)
@@ -97,6 +97,30 @@ def get_score_for_frame(autoencoder, data, frame_no, threshold=0.9, visualize=Fa
     return score, no_true_convex_hulls, no_pred_convex_hulls, end_time - start_time
 
 
+def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False)
+    x, y = get_frame(data, frame_no)
+    x = x.reshape(300, 400)
+
+    # convert frame to the same representation as for the autoencoder algorithm to make fair comparison
+    # 1) Extract predicted convex hulls
+    py = predict(autoencoder, data.normalize(x.copy()))
+    py = tools.make_numpy(py.cpu())
+    py[py >= threshold] = 1
+    py[py < threshold] = 0
+    # 2) Extract points from the original grid which belongs to predicted convex hulls
+    valid_inds = (x > 0) & (py > 0)
+    common_grid = np.zeros_like(x)
+    common_grid[valid_inds] = 1
+    true_labels = x[valid_inds]
+
+    # now run the baseline algorithm
+    closed_grid = ndimage.binary_closing(common_grid, structure=[4, 4]))
+    predicted_labels, _ = cluster(grid)
+
+    return metrics.adjusted_mutual_info_score(true_labels, predicted_labels)
+
+
+
 def main():
     # create model
     autoencoder_weights = torch.load("conv_autoencoder.pth", map_location=lambda storage, loc: storage)
@@ -106,6 +130,7 @@ def main():
     # load data
     data = tools.DataLoader("/mnt/moria/voyage_clustering/convex_hulls2.npy")
     scores = []
+    baseline_scores = []
     tcs = []
     pcs = []
     ets = []
@@ -113,17 +138,21 @@ def main():
     progress = Bar("Evaluation: ", max=len(data.valid_x))
     for frame_no in range(0, len(data.valid_x)):
         progress.next()
-        score, tc, pc, et = get_score_for_frame(autoencoder, data, frame_no, threshold=0.9)
+        score, tc, pc, et = eval_autoencdoer(autoencoder, data, frame_no, threshold=0.9)
+        baseline_score = eval_baseline(autoencoder, data, frame_no, threshold=0.9)
+
         if math.isnan(score):
             continue
         scores.append(score)
         tcs.append(tc)
         pcs.append(pc)
         ets.append(et)
+        baseline_scores.append(baseline_score)
 
     progress.finish()
 
-    stats("Score", scores)
+    stats("Autoencoder score", scores)
+    stats("Baseline score", baseline_scores)
     stats("Convex hulls", np.abs(np.array(tcs) - np.array(pcs)))
     print("\nMean execution time: {:.4f}".format(np.mean(et)))
 
