@@ -2,6 +2,7 @@ import tools
 from progress.bar import Bar
 from scipy import ndimage
 from sklearn import metrics
+import numpy as np
 
 def stats(name, data):
     print("\n============ {} ============".format(name))
