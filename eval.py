@@ -97,7 +97,7 @@ def eval_autoencdoer(autoencoder, data, frame_no, threshold=0.9, visualize=False
     return score, no_true_convex_hulls, no_pred_convex_hulls, end_time - start_time
 
 
-def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False)
+def eval_baseline(autoencoder, data, frame_no, threshold=0.9, visualize=False):
     x, y = get_frame(data, frame_no, data.pivot)
     x = x.reshape(300, 400)
 
