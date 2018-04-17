@@ -24,7 +24,7 @@ def main():
     for x, y in zip(data.x, data.y):
         # convert to nice size
         x = x.reshape(300, 400)
-        y = y.reshape(400, 400)
+        y = y.reshape(300, 400)
 
         # extract pixels which are present only on the both images
         common = np.zeros_like(x)
