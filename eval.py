@@ -139,6 +139,8 @@ def main():
     pcs = []
     ets = []
 
+    print(np.unique(data.x))
+
     progress = Bar("Evaluation: ", max=len(data.valid_x))
     for frame_no in range(0, len(data.valid_x)):
         progress.next()
